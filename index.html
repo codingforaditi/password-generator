@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PassCraft - Simple Version</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+    body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:20px;transition:background 0.3s,color 0.3s;}
+    
+    /* --- Themes --- */
+    body.green {
+      background: linear-gradient(135deg,#0b1f14,#3bb97f);
+      color: #e9fff3;
+    }
+    body.purple {
+      background: linear-gradient(135deg,#6a11cb,#2575fc);
+      color: #fff;
+    }
+    
+    /* --- Card --- */
+    .card{
+      background:rgba(255,255,255,0.2);
+      border-radius:15px;
+      padding:20px;
+      width:320px;
+      text-align:center;
+      box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      transition:background 0.3s;
+    }
+    body.purple .card{
+      background: rgba(255,255,255,0.1);
+    }
+    
+    h1{margin-bottom:15px;}
+    
+    /* --- Inputs --- */
+    input[type="number"]{
+      width:80%;
+      padding:10px;
+      margin-bottom:12px;
+      border:none;
+      border-radius:10px;
+      outline:none;
+      font-weight:600;
+      text-align:center;
+      transition:0.2s;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.1);
+      color: inherit;
+    }
+    input[type="number"]::placeholder{
+      color: rgba(255,255,255,0.8);
+      font-weight:500;
+    }
+    body.purple input[type="number"]::placeholder{
+      color: rgba(255,255,255,0.7);
+    }
+    input[type="number"]:focus{box-shadow:0 8px 25px rgba(0,0,0,0.2);}
+    
+    /* --- Buttons --- */
+    button{
+      padding:10px 20px;
+      margin:5px 0;
+      border:none;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.2s;
+    }
+    .generate{
+      background: linear-gradient(135deg,#3bb97f,#0b1f14);
+      color:white;
+      box-shadow:0 5px 15px rgba(59,185,127,0.3);
+    }
+    body.purple .generate{
+      background: linear-gradient(135deg,#6a11cb,#2575fc);
+      box-shadow:0 5px 15px rgba(106,17,203,0.3);
+      color:white;
+    }
+    .generate:hover{transform:translateY(-3px);}
+    
+    .copy{
+      background:rgba(255,255,255,0.2);
+      color:#e9fff3;
+    }
+    body.purple .copy{
+      background:rgba(255,255,255,0.1);
+      color:#fff;
+    }
+    
+    /* --- Output --- */
+    #output{
+      margin-top:10px;
+      padding:10px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.2);
+      word-break:break-word;
+      font-weight:600;
+      transition:0.2s;
+    }
+    body.purple #output{
+      background:rgba(255,255,255,0.1);
+      color:inherit;
+    }
+    
+    /* --- Theme Toggle --- */
+    .toggle{
+      margin-bottom:15px;
+      cursor:pointer;
+      font-weight:600;
+      text-decoration:underline;
+    }
+    
+    /* --- Footer --- */
+    .footer {
+      margin-top: 15px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .footer a {
+      color: inherit;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .footer a:hover {
+      color: #3bb97f;
+    }
+    body.purple .footer a:hover {
+      color: #6a11cb;
+    }
+
+    @media(max-width:400px){
+      .card{width:90%;}
+      input[type="number"]{width:90%;}
+    }
+  </style>
+</head>
+<body class="green">
+
+  <div class="toggle">Toggle Theme</div>
+
+  <div class="card">
+    <h1>🔐 PassCraft</h1>
+    <input type="number" id="length" placeholder="Enter password length">
+    <button class="generate" id="generateBtn">Generate</button>
+    <div id="output">Your password will appear here</div>
+    <button class="copy" id="copyBtn">Copy</button>
+  </div>
+
+  <div class="footer">
+    Created by 
+    <a href="https://github.com/codingforaditi" target="_blank">Aditi (GitHub)</a> | 
+    <a href="https://www.linkedin.com/in/aditi-b-5a00a3304/" target="_blank">LinkedIn</a>
+  </div>
+
+  <script>
+    const bodyEl = document.body;
+    const toggle = document.querySelector('.toggle');
+    toggle.addEventListener('click', ()=>{
+      bodyEl.classList.toggle('green');
+      bodyEl.classList.toggle('purple');
+    });
+
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    const symbols = '!@#$%^&*()_+-={}[]|:;<>,.?/';
+
+    const generateBtn = document.getElementById('generateBtn');
+    const output = document.getElementById('output');
+    const copyBtn = document.getElementById('copyBtn');
+    const lengthInput = document.getElementById('length');
+
+    function getRandomChar(str){ return str[Math.floor(Math.random()*str.length)]; }
+    function shuffle(s){ return s.split('').sort(()=>Math.random()-0.5).join(''); }
+
+    function generatePassword(){
+      let len = parseInt(lengthInput.value);
+      if(!len || len < 1){
+        output.textContent = "Please enter a number ≥ 1";
+        return;
+      }
+
+      let pwd = '';
+      const all = lower+upper+digits+symbols;
+      if(len >= 4){
+        pwd = getRandomChar(lower)+getRandomChar(upper)+getRandomChar(digits)+getRandomChar(symbols);
+        for(let i=4;i<len;i++){ pwd+=getRandomChar(all); }
+      } else {
+        for(let i=0;i<len;i++){ pwd+=getRandomChar(all); }
+      }
+
+      pwd = shuffle(pwd);
+      output.textContent = pwd;
+    }
+
+    generateBtn.addEventListener('click',generatePassword);
+
+    copyBtn.addEventListener('click',()=>{
+      navigator.clipboard.writeText(output.textContent);
+      copyBtn.textContent='Copied!';
+      setTimeout(()=>{copyBtn.textContent='Copy';},1500);
+    });
+  </script>
+</body>
+</html>
